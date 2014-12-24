@@ -9,6 +9,7 @@ static NSUInteger const kSendBufferSize = 32768;
 
 @interface FTPUpload () <NSStreamDelegate>
 @property (atomic, copy, readwrite) NSString *source;
+@property (atomic, copy, readwrite) NSString *uploadedPath;
 
 @property (atomic, strong, readwrite) NSOutputStream *networkStream;
 @property (atomic, strong, readwrite) NSInputStream *fileStream;
@@ -77,11 +78,13 @@ static NSUInteger const kSendBufferSize = 32768;
 	if (shouldRandomize.boolValue) {
 		// Prepare a random 12-character filename.
 		NSString *randomString = [NSString shr_randomizedAlphanumericStringOfLength:12];
-		NSString *randomFilename = [randomString stringByAppendingString:self.source.pathExtension];
+		NSString *randomFilename = [randomString stringByAppendingFormat:@".%@", self.source.pathExtension];
 		url = [url URLByAppendingPathComponent:randomFilename];
 	} else {
 		url = [url URLByAppendingPathComponent:self.source.lastPathComponent];
 	}
+	
+	self.uploadedPath = url.absoluteString;
 	
 	if (!url) {
 		return NO;

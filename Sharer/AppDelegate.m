@@ -165,7 +165,7 @@
 	[self stopUpdatingButtonTitle];
 
 	NSString *URLFormat = [[NSUserDefaults standardUserDefaults] objectForKey:@"URLFormat"];
-	NSURL *URL = [[NSURL URLWithString:URLFormat] URLByAppendingPathComponent:upload.source.lastPathComponent];
+	NSURL *URL = [[NSURL URLWithString:URLFormat] URLByAppendingPathComponent:upload.uploadedPath.lastPathComponent];
 
 	[[NSPasteboard generalPasteboard] setString:URL.absoluteString forType:NSStringPboardType];
 

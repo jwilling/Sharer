@@ -15,6 +15,7 @@
 @property (atomic, weak) id <UploadDelegate> delegate;
 @property (nonatomic, assign, readonly) BOOL isSending;
 @property (atomic, copy, readonly) NSString *source;
+@property (atomic, copy, readonly) NSString *uploadedPath;
 
 - (BOOL) startOnQueue:(dispatch_queue_t) uploadQueue;
 - (void) stop;

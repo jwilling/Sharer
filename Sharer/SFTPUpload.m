@@ -12,6 +12,7 @@
 
 @interface SFTPUpload ()
 @property (atomic, copy, readwrite) NSString *source;
+@property (atomic, copy, readwrite) NSString *uploadedPath;
 @property (atomic, strong) NMSSHSession *session;
 @property (atomic, strong) NMSFTP *sftpSession;
 @end
@@ -95,9 +96,11 @@
 		if (shouldRandomize.boolValue) {
 			// Prepare a random 12-character filename.
 			NSString *randomString = [NSString shr_randomizedAlphanumericStringOfLength:12];
-			NSString *randomFilename = [randomString stringByAppendingString:strongSelf.source.pathExtension];
+			NSString *randomFilename = [randomString stringByAppendingFormat:@".%@", self.source.pathExtension];
 			fullRemotePath = [remotePath stringByAppendingPathComponent:randomFilename];
 		}
+		
+		self.uploadedPath = fullRemotePath;
 		
 		BOOL wroteStream = [sftpSession writeStream:inputStream toFileAtPath:fullRemotePath progress:^BOOL(NSUInteger progress) {
 			if (progress == fileLength) {
