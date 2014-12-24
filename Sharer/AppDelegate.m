@@ -17,6 +17,7 @@
 @property (weak) IBOutlet NSTextField *portTextField;
 @property (weak) IBOutlet NSTextField *usernameTextField;
 @property (weak) IBOutlet NSTextField *passwordTextField;
+@property (weak) IBOutlet NSButton *randomFilenameButton;
 
 @property (strong) NSStatusItem *statusItem;
 
@@ -52,15 +53,19 @@
 
 #define SetValueOfTypeOnField(type, field, fromKeychain) \
 	do { \
-		NSString *value = nil; \
+		id value = nil; \
 		if (fromKeychain) { \
 			value = [[CQKeychain standardKeychain] passwordForServer:type area:@"sharer"]; \
 		} else { \
 			value = [[NSUserDefaults standardUserDefaults] objectForKey:type]; \
 		} \
  \
-		if (value.length) { \
-			field.stringValue = value; \
+		if (value != nil) { \
+			if ([value isKindOfClass:NSString.class]) { \
+				field.stringValue = value; \
+			} else { \
+				((NSButton *)field).state = [value intValue]; \
+			} \
 		} \
 	} while (0)
 
@@ -70,6 +75,7 @@
 	SetValueOfTypeOnField(@"URLFormat", self.URLFormatTextField, NO);
 	SetValueOfTypeOnField(@"username", self.usernameTextField, NO);
 	SetValueOfTypeOnField(@"password", self.passwordTextField, YES);
+	SetValueOfTypeOnField(@"randomizedFilename", self.randomFilenameButton, NO);
 #undef SetValueOfTypeOnField
 }
 
@@ -133,6 +139,10 @@
 		return validPort;
 	}
 	return YES;
+}
+
+- (IBAction) randomizedFilenameButtonClicked:(NSButton *) sender {
+	[[NSUserDefaults standardUserDefaults] setObject:@(self.randomFilenameButton.state) forKey:@"randomizedFilename"];
 }
 
 #pragma mark -

@@ -1,4 +1,5 @@
 #import "FTPUpload.h"
+#import "NSString+Randomization.h"
 
 #import "CQKeychain.h"
 
@@ -72,7 +73,16 @@ static NSUInteger const kSendBufferSize = 32768;
 		}
 	}
 
-	url = [url URLByAppendingPathComponent:self.source.lastPathComponent];
+	NSNumber *shouldRandomize = [[NSUserDefaults standardUserDefaults] objectForKey:@"randomizedFilename"];
+	if (shouldRandomize.boolValue) {
+		// Prepare a random 12-character filename.
+		NSString *randomString = [NSString shr_randomizedAlphanumericStringOfLength:12];
+		NSString *randomFilename = [randomString stringByAppendingString:self.source.pathExtension];
+		url = [url URLByAppendingPathComponent:randomFilename];
+	} else {
+		url = [url URLByAppendingPathComponent:self.source.lastPathComponent];
+	}
+	
 	if (!url) {
 		return NO;
 	}	

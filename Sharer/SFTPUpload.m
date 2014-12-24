@@ -1,4 +1,5 @@
 #import "SFTPUpload.h"
+#import "NSString+Randomization.h"
 
 #import "CQKeychain.h"
 #import <NMSSH/NMSSH.h>
@@ -89,6 +90,15 @@
 		[strongDelegate uploadDidStart:strongSelf];
 
 		NSString *fullRemotePath = [remotePath stringByAppendingPathComponent:strongSelf.source.lastPathComponent];
+		
+		NSNumber *shouldRandomize = [[NSUserDefaults standardUserDefaults] objectForKey:@"randomizedFilename"];
+		if (shouldRandomize.boolValue) {
+			// Prepare a random 12-character filename.
+			NSString *randomString = [NSString shr_randomizedAlphanumericStringOfLength:12];
+			NSString *randomFilename = [randomString stringByAppendingString:strongSelf.source.pathExtension];
+			fullRemotePath = [remotePath stringByAppendingPathComponent:randomFilename];
+		}
+		
 		BOOL wroteStream = [sftpSession writeStream:inputStream toFileAtPath:fullRemotePath progress:^BOOL(NSUInteger progress) {
 			if (progress == fileLength) {
 				dispatch_async(dispatch_get_main_queue(), ^{ // give the sftp session a chance to finish up any remaining work it has before we remove our references to it
